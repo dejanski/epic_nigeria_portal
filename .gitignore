@@ -1,0 +1,28 @@
+# Python
+*.pyc
+__pycache__
+.env/
+venv/
+env/
+pip-wheel-metadata/
+build/
+develop-eggs/
+dist/
+*egg-info/
+
+# Django
+*.sqlite3
+db.sqlite3
+/media
+/static
+# Uncomment the following if you want to ignore all migrations (generally not recommended)
+# migrations/
+# except the __init__.py files
+# migrations/*/__init__.py
+
+# IDE and OS Files
+.idea/                     # JetBrains IDEs (e.g., PyCharm)
+.vscode/                   # VS Code
+.DS_Store                  # macOS files
+Thumbs.db                  # Windows files
+
