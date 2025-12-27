@@ -1,8 +1,11 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
-from .serializers import PrescriptionSerializer
+from .serializers import PrescriptionSerializer, RefillRequestSerializer
+from drf_spectacular.utils import extend_schema
+from .models import Prescription, RefillRequest
 
+@extend_schema(request=PrescriptionSerializer, responses={201: dict})
 @api_view(['POST'])
 def prescribe_medication(request):
     if request.user.role not in ['clinician', 'admin']:
@@ -16,8 +19,8 @@ def prescribe_medication(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-from .models import RefillRequest
 
+@extend_schema(request=None, responses={201: dict})
 @api_view(['POST'])
 def request_refill(request, prescription_id):
     if request.user.role != 'patient':

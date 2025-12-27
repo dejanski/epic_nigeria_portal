@@ -18,9 +18,11 @@ from django.contrib import admin
 
 from django.urls import path, include
 from drf_spectacular.views import SpectacularAPIView, SpectacularSwaggerView
+from django.views.generic import RedirectView
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('', RedirectView.as_view(url='/api/docs/', permanent=False)),
     path('o/', include('oauth2_provider.urls', namespace='oauth2_provider')),
     
     path('api/patients/', include('patients.urls')),

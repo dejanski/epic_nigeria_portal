@@ -5,7 +5,9 @@ from .models import Appointment
 from .serializers import AppointmentSerializer
 from patients.models import Patient
 from accounts.models import User
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(request=AppointmentSerializer, responses={201: dict})
 @api_view(['POST'])
 def book_appointment(request):
     # Patient or admin can book

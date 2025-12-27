@@ -2,7 +2,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ClinicalNoteSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(request=ClinicalNoteSerializer, responses={201: dict})
 @api_view(['POST'])
 def document_clinical_note(request):
     if request.user.role != 'clinician':

@@ -2,7 +2,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import Message
 from accounts.models import User
+from .serializers import MessageSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(request=MessageSerializer, responses={201: dict})
 @api_view(['POST'])
 def send_message(request):
     if request.user.role not in ['patient', 'clinician', 'admin']:

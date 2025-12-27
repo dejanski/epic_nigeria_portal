@@ -6,7 +6,10 @@ from clinical.models import ClinicalNote
 from billing.models import Claim
 from django.db import connection
 from django.http import JsonResponse
+from drf_spectacular.utils import extend_schema
+from drf_spectacular.types import OpenApiTypes
 
+@extend_schema(responses={200: OpenApiTypes.OBJECT})
 @api_view(['GET'])
 def analytics_summary(request):
     clinic_id = request.GET.get('clinic_id')
@@ -27,6 +30,7 @@ def analytics_summary(request):
 
 
 
+@extend_schema(responses={200: OpenApiTypes.OBJECT})
 @api_view(['GET'])
 def system_status(request):
     # Check DB

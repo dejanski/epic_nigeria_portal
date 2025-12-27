@@ -1,6 +1,8 @@
 # Python
 *.pyc
 __pycache__
+.pyc
+.env
 .env/
 venv/
 env/
@@ -25,4 +27,10 @@ db.sqlite3
 .vscode/                   # VS Code
 .DS_Store                  # macOS files
 Thumbs.db                  # Windows files
+
+# Validations and Unit Tests
+.pytest_cache/
+.mypy_cache/
+.coverage
+htmlcov/
 

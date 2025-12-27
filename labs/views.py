@@ -2,7 +2,10 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from django.shortcuts import get_object_or_404
 from .models import LabResult
+from .serializers import LabResultSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(responses=LabResultSerializer(many=True))
 @api_view(['GET'])
 def get_lab_results(request, patient_id):
     # Clinician, admin, or patient (for self)

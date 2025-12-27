@@ -3,7 +3,9 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from .serializers import PatientRegistrationSerializer
 from .models import Patient
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(request=PatientRegistrationSerializer, responses={201: dict})
 @api_view(['POST'])
 def register_patient(request):
     serializer = PatientRegistrationSerializer(data=request.data)
@@ -15,6 +17,7 @@ def register_patient(request):
         }, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+@extend_schema(request=PatientRegistrationSerializer, responses={200: dict})
 @api_view(['PATCH'])
 def update_patient_profile(request, patient_id):
     try:

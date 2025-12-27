@@ -1,7 +1,10 @@
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from .models import AuditLog
+from .serializers import AuditLogSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(responses=AuditLogSerializer(many=True))
 @api_view(['GET'])
 def get_audit_logs(request):
     if request.user.role != 'admin':

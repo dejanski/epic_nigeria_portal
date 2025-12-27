@@ -3,7 +3,9 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import status
 from .serializers import ClaimSerializer
+from drf_spectacular.utils import extend_schema
 
+@extend_schema(request=ClaimSerializer, responses={201: dict})
 @api_view(['POST'])
 def submit_claim(request):
     if request.user.role not in ['billing_staff', 'admin']:
