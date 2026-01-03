@@ -3,9 +3,12 @@ import api from '../api';
 import Sidebar from '../components/Sidebar';
 import { useParams, useNavigate } from 'react-router-dom';
 
-const PatientDetail = () => {
+const PatientDetail = ({ patientIdOverride, isPatientView = false }) => {
     const { id } = useParams();
     const navigate = useNavigate();
+    // Use override if provided (for Portal), otherwise use route param
+    const effectiveId = patientIdOverride || id;
+
     const [patient, setPatient] = useState(null);
     const [activeTab, setActiveTab] = useState('clinical'); // clinical, meds, appointments, labs, billing
     const [labs, setLabs] = useState([]);
@@ -16,15 +19,15 @@ const PatientDetail = () => {
     useEffect(() => {
         const fetchPatient = async () => {
             try {
-                const response = await api.get(`/api/patients/${id}/update/`);
+                const response = await api.get(`/api/patients/${effectiveId}/update/`);
                 setPatient(response.data);
                 setEditForm(response.data);
             } catch (error) {
                 console.error(error);
             }
         };
-        fetchPatient();
-    }, [id]);
+        if (effectiveId) fetchPatient();
+    }, [effectiveId]);
 
     const handleEditChange = (e) => {
         setEditForm({ ...editForm, [e.target.name]: e.target.value });
@@ -39,6 +42,19 @@ const PatientDetail = () => {
         } catch (error) {
             console.error(error);
             alert('Failed to update profile');
+        }
+    };
+
+    const handleDeletePatient = async () => {
+        if (window.confirm('Are you sure you want to delete this patient? This action cannot be undone.')) {
+            try {
+                await api.delete(`/api/patients/${id}/delete/`);
+                alert('Patient record deleted.');
+                navigate('/patients');
+            } catch (error) {
+                console.error(error);
+                alert('Failed to delete patient. Ensure you have admin privileges.');
+            }
         }
     };
 
@@ -82,13 +98,13 @@ const PatientDetail = () => {
         } else if (activeTab === 'appointments') {
             const fetchAppointments = async () => {
                 try {
-                    const res = await api.get(`/api/appointments/list/?patient_id=${id}`);
+                    const res = await api.get(`/api/appointments/list/?patient_id=${effectiveId}`);
                     setAppointments(res.data);
                 } catch (err) { console.error(err); }
             };
             fetchAppointments();
         }
-    }, [activeTab, id]);
+    }, [activeTab, effectiveId]);
 
     // ... existing handlers ...
 
@@ -163,7 +179,9 @@ const PatientDetail = () => {
         <div className="layout-container">
             <Sidebar />
             <div className="main-content">
-                <button onClick={() => navigate('/patients')} style={{ marginBottom: '10px', backgroundColor: '#6c757d', color: 'white', padding: '5px 10px' }}>&larr; Back to List</button>
+                {!isPatientView && (
+                    <button onClick={() => navigate('/patients')} style={{ marginBottom: '10px', backgroundColor: '#6c757d', color: 'white', padding: '5px 10px' }}>&larr; Back to List</button>
+                )}
 
                 <div className="card" style={{ display: 'flex', gap: '20px', alignItems: 'flex-start' }}>
                     <div style={{ width: '80px', height: '80px', borderRadius: '50%', backgroundColor: '#dee2e6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2rem', color: '#6c757d', alignSelf: 'center' }}>
@@ -186,11 +204,19 @@ const PatientDetail = () => {
                             <>
                                 <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
                                     <h2 style={{ margin: 0 }}>{patient.name}</h2>
-                                    <button className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.8rem' }} onClick={() => setIsEditing(true)}>Edit Profile</button>
+                                    {!isPatientView && (
+                                        <button className="btn-primary" style={{ padding: '5px 10px', fontSize: '0.8rem' }} onClick={() => setIsEditing(true)}>Edit Profile</button>
+                                    )}
                                 </div>
                                 <p style={{ margin: '5px 0', color: '#666' }}>ID: #{patient.id} | Born: {patient.date_of_birth} | {patient.gender} | Phone: {patient.phone_number || 'N/A'}</p>
                                 {patient.guardian_name && <p style={{ margin: '5px 0', color: '#0056b3', fontSize: '0.9em' }}>Guardian: {patient.guardian_name}</p>}
                                 <p style={{ margin: 0, color: '#666' }}>Plan: {patient.insurance_provider} | Contact: {patient.contact_info}</p>
+
+                                {!isPatientView && (localStorage.getItem('user_role') === 'admin' || localStorage.getItem('is_superuser') === 'true') && (
+                                    <div style={{ marginTop: '15px' }}>
+                                        <button className="btn-danger" onClick={handleDeletePatient} style={{ fontSize: '0.8rem', padding: '5px 10px', backgroundColor: '#dc3545', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}>Delete Patient Record</button>
+                                    </div>
+                                )}
                             </>
                         )}
                     </div>

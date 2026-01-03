@@ -34,7 +34,11 @@ const Login = () => {
             localStorage.setItem('is_superuser', userRes.data.is_superuser);
             localStorage.setItem('user_role', userRes.data.role);
 
-            navigate('/dashboard');
+            if (userRes.data.role === 'patient') {
+                navigate('/portal');
+            } else {
+                navigate('/dashboard');
+            }
         } catch (err) {
             console.error(err);
             setError('Invalid username or password.');

@@ -7,6 +7,8 @@ const Sidebar = () => {
     const handleLogout = () => {
         localStorage.removeItem('access_token');
         localStorage.removeItem('refresh_token');
+        localStorage.removeItem('user_role');
+        localStorage.removeItem('is_superuser');
         navigate('/');
     };
 
@@ -14,18 +16,28 @@ const Sidebar = () => {
         <div className="sidebar">
             <h2>EPIC Portal</h2>
             <nav style={{ flex: 1 }}>
-                <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Dashboard</NavLink>
-                <NavLink to="/patients" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Patients</NavLink>
-                <NavLink to="/appointments" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Scheduling</NavLink>
-                <NavLink to="/labs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Labs</NavLink>
-                <NavLink to="/claims" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Claims</NavLink>
-                <NavLink to="/clinical" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Clinical Notes</NavLink>
-                <NavLink to="/pharmacy" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Pharmacy</NavLink>
-                <NavLink to="/audit" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>System Audit</NavLink>
-                {localStorage.getItem('is_superuser') === 'true' && (
-                    <NavLink to="/staff" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Staff Admin</NavLink>
+                {localStorage.getItem('user_role') === 'patient' ? (
+                    <NavLink to="/portal" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>My Health Record</NavLink>
+                ) : (
+                    <>
+                        <NavLink to="/dashboard" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Dashboard</NavLink>
+                        <NavLink to="/patients" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Patients</NavLink>
+                        <NavLink to="/appointments" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Scheduling</NavLink>
+                        <NavLink to="/labs" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Labs</NavLink>
+                        <NavLink to="/claims" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Claims</NavLink>
+                        {localStorage.getItem('user_role') === 'clinician' && (
+                            <NavLink to="/clinical" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Clinical Notes</NavLink>
+                        )}
+                        {localStorage.getItem('user_role') === 'clinician' && (
+                            <NavLink to="/pharmacy" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Pharmacy</NavLink>
+                        )}
+                        <NavLink to="/audit" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>System Audit</NavLink>
+                        {localStorage.getItem('is_superuser') === 'true' && (
+                            <NavLink to="/staff" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Staff Admin</NavLink>
+                        )}
+                        <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Settings</NavLink>
+                    </>
                 )}
-                <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Settings</NavLink>
             </nav>
             <button
                 onClick={handleLogout}

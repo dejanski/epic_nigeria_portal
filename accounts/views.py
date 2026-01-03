@@ -46,6 +46,11 @@ def current_user(request):
         serializer = UserSerializer(request.user)
         data = serializer.data
         data['is_superuser'] = request.user.is_superuser
+        
+        # If user is a patient, include their patient_id
+        if request.user.role == 'patient' and hasattr(request.user, 'patient'):
+            data['patient_id'] = request.user.patient.id
+            
         return Response(data)
     
     serializer = UserSerializer(request.user, data=request.data, partial=True)

@@ -1,6 +1,7 @@
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from .serializers import PatientRegistrationSerializer
 from .models import Patient
 from drf_spectacular.utils import extend_schema
@@ -41,6 +42,21 @@ def update_patient_profile(request, patient_id):
         serializer.save()
         return Response({'status': 'Profile updated'}, status=200)
     return Response(serializer.errors, status=400)
+
+@extend_schema(responses={204: None})
+@api_view(['DELETE'])
+@permission_classes([IsAuthenticated])
+def delete_patient(request, patient_id):
+    try:
+        patient = Patient.objects.get(id=patient_id)
+    except Patient.DoesNotExist:
+        return Response({'error': 'Patient not found'}, status=404)
+
+    if not request.user.is_superuser and request.user.role != 'admin':
+         return Response({'error': 'Unauthorized. Only Admins can delete bookings/patients.'}, status=403)
+
+    patient.delete()
+    return Response(status=status.HTTP_204_NO_CONTENT)
 
 @extend_schema(responses={200: PatientRegistrationSerializer(many=True)})
 @api_view(['GET'])

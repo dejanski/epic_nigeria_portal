@@ -12,6 +12,7 @@ import LabDashboard from './pages/LabDashboard';
 import ClaimsDashboard from './pages/ClaimsDashboard';
 import AuditLog from './pages/AuditLog';
 import StaffManagement from './pages/StaffManagement';
+import PatientPortal from './pages/PatientPortal';
 import Settings from './pages/Settings';
 
 function App() {
@@ -68,6 +69,10 @@ function App() {
         <Route
           path="/staff"
           element={isAuthenticated ? <StaffManagement /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/portal"
+          element={isAuthenticated ? <PatientPortal /> : <Navigate to="/" />}
         />
       </Routes>
     </Router>
