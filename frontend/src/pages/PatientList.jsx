@@ -2,11 +2,14 @@ import React, { useEffect, useState } from 'react';
 import api from '../api';
 import Sidebar from '../components/Sidebar';
 import { useNavigate } from 'react-router-dom';
+import LoadingSpinner from '../components/LoadingSpinner';
+import EmptyState from '../components/EmptyState';
+import './PatientList.css'; // Assuming you might move CSS to a file later, but for now inline is fine
 
 const PatientList = () => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
+    const [search, setSearch] = useState(''); // Changed from searchTerm to search
     const navigate = useNavigate();
 
     useEffect(() => {
@@ -30,8 +33,14 @@ const PatientList = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchPatients(searchTerm);
+        fetchPatients(search); // Use 'search' state
     };
+
+    // Filter patients based on the search term for display
+    const filteredPatients = patients.filter(patient =>
+        patient.name.toLowerCase().includes(search.toLowerCase()) ||
+        String(patient.id).includes(search)
+    );
 
     return (
         <div className="layout-container">
@@ -44,8 +53,8 @@ const PatientList = () => {
                             <input
                                 type="text"
                                 placeholder="Search Name or ID..."
-                                value={searchTerm}
-                                onChange={(e) => setSearchTerm(e.target.value)}
+                                value={search} // Use 'search' state
+                                onChange={(e) => setSearch(e.target.value)} // Update 'search' state
                                 style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ced4da', marginRight: '5px' }}
                             />
                             <button type="submit" className="btn-primary" style={{ padding: '8px 15px' }}>Search</button>
@@ -56,49 +65,23 @@ const PatientList = () => {
                     </div>
                 </div>
 
-                {loading ? (
-                    <p>Loading...</p>
-                ) : (
-                    <div className="card" style={{ padding: '0', overflow: 'hidden' }}>
-                        <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                            <thead style={{ backgroundColor: '#f8f9fa', borderBottom: '2px solid #dee2e6' }}>
-                                <tr>
-                                    <th style={{ padding: '15px' }}>ID</th>
-                                    <th style={{ padding: '15px' }}>Name</th>
-                                    <th style={{ padding: '15px' }}>Date of Birth</th>
-                                    <th style={{ padding: '15px' }}>Gender</th>
-                                    <th style={{ padding: '15px' }}>Insurance</th>
-                                    <th style={{ padding: '15px' }}>Action</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {patients.length === 0 ? (
-                                    <tr>
-                                        <td colSpan="6" style={{ padding: '20px', textAlign: 'center' }}>No patients found.</td>
-                                    </tr>
-                                ) : (
-                                    patients.map((patient) => (
-                                        <tr key={patient.id} style={{ borderBottom: '1px solid #dee2e6' }}>
-                                            <td style={{ padding: '15px' }}>#{patient.id}</td>
-                                            <td style={{ padding: '15px', fontWeight: 'bold' }}>{patient.name}</td>
-                                            <td style={{ padding: '15px' }}>{patient.date_of_birth}</td>
-                                            <td style={{ padding: '15px' }}>{patient.gender}</td>
-                                            <td style={{ padding: '15px' }}>{patient.insurance_provider}</td>
-                                            <td style={{ padding: '15px' }}>
-                                                <button
-                                                    style={{ padding: '5px 10px', fontSize: '0.8rem', backgroundColor: '#0056b3', color: 'white', cursor: 'pointer' }}
-                                                    onClick={() => navigate(`/patients/${patient.id}`)}
-                                                >
-                                                    View
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    ))
-                                )}
-                            </tbody>
-                        </table>
-                    </div>
-                )}
+                <div className="patient-grid">
+                    {loading ? (
+                        <LoadingSpinner />
+                    ) : filteredPatients.length > 0 ? (
+                        filteredPatients.map(patient => (
+                            <div key={patient.id} className="patient-card" onClick={() => navigate(`/patients/${patient.id}`)}>
+                                <h3>{patient.name}</h3>
+                                <p><strong>ID:</strong> {patient.id}</p>
+                                <p><strong>DOB:</strong> {patient.date_of_birth}</p> {/* Changed from patient.dob to patient.date_of_birth */}
+                                <p><strong>Gender:</strong> {patient.gender}</p> {/* Added gender */}
+                                <p><strong>Insurance:</strong> {patient.insurance_provider}</p> {/* Added insurance */}
+                            </div>
+                        ))
+                    ) : (
+                        <EmptyState message="No patients found matching your search." />
+                    )}
+                </div>
             </div>
         </div>
     );

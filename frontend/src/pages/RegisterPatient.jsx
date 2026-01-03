@@ -6,19 +6,31 @@ const RegisterPatient = () => {
     const [formData, setFormData] = useState({
         name: '',
         date_of_birth: '',
-        gender: '',
+        gender: 'M',
         contact_info: '',
+        phone_number: '',
+        guardian_name: '',
         insurance_provider: '',
         nhia_id: ''
     });
+    const [isMinor, setIsMinor] = useState(false);
     const [message, setMessage] = useState('');
     const navigate = useNavigate();
 
     const handleChange = (e) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+
+        if (name === 'date_of_birth') {
+            const birthDate = new Date(value);
+            const today = new Date();
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+            setIsMinor(age < 18);
+        }
     };
 
     const handleSubmit = async (e) => {
@@ -49,18 +61,51 @@ const RegisterPatient = () => {
                 </div>
                 <div style={{ marginBottom: '10px' }}>
                     <label>Gender:</label>
-                    <select name="gender" onChange={handleChange} required style={{ width: '100%', padding: '8px' }}>
+                    <select name="gender" onChange={handleChange} required style={{ width: '100%', padding: '8px' }} value={formData.gender}>
                         <option value="">Select Gender</option>
                         <option value="M">Male</option>
                         <option value="F">Female</option>
                         <option value="O">Other</option>
                     </select>
                 </div>
-                <div style={{ marginBottom: '10px' }}>
-                    <label>Contact Info:</label>
-                    <input name="contact_info" type="text" onChange={handleChange} required style={{ width: '100%', padding: '8px' }} />
+                <div className="form-group" style={{ marginBottom: '10px' }}>
+                    <label>Contact Info (Address)</label>
+                    <textarea
+                        name="contact_info"
+                        value={formData.contact_info}
+                        onChange={handleChange}
+                        required
+                        style={{ width: '100%', padding: '8px' }}
+                    />
                 </div>
-                <div style={{ marginBottom: '10px' }}>
+
+                <div className="form-row" style={{ marginBottom: '10px' }}>
+                    <div className="form-group" style={{ width: isMinor ? '48%' : '100%', display: 'inline-block', marginRight: isMinor ? '4%' : '0' }}>
+                        <label>Phone Number</label>
+                        <input
+                            type="tel"
+                            name="phone_number"
+                            value={formData.phone_number}
+                            onChange={handleChange}
+                            style={{ width: '100%', padding: '8px' }}
+                        />
+                    </div>
+                    {isMinor && (
+                        <div className="form-group" style={{ width: '48%', display: 'inline-block' }}>
+                            <label>Parent/Guardian Name <span style={{ color: 'red' }}>*</span></label>
+                            <input
+                                type="text"
+                                name="guardian_name"
+                                value={formData.guardian_name}
+                                onChange={handleChange}
+                                required
+                                style={{ width: '100%', padding: '8px' }}
+                            />
+                        </div>
+                    )}
+                </div>
+
+                <div className="form-group" style={{ marginBottom: '10px' }}>
                     <label>Insurance Provider:</label>
                     <input name="insurance_provider" type="text" onChange={handleChange} required style={{ width: '100%', padding: '8px' }} />
                 </div>

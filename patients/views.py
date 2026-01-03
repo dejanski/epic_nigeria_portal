@@ -29,7 +29,7 @@ def update_patient_profile(request, patient_id):
     if request.user.role == 'patient':
         if not hasattr(request.user, 'patient') or request.user.patient.id != patient.id:
             return Response({'error': 'You can only update your own profile'}, status=403)
-    elif not request.user.is_superuser and request.user.role not in ['admin', 'billing_staff', 'clinician']:
+    elif not request.user.is_superuser and request.user.role not in ['admin', 'billing_staff', 'clinician', 'nurse']:
         return Response({'error': 'Unauthorized'}, status=403)
 
     if request.method == 'GET':
@@ -46,7 +46,7 @@ def update_patient_profile(request, patient_id):
 @api_view(['GET'])
 def list_patients(request):
     # RBAC: only staff/admin
-    if not request.user.is_superuser and request.user.role not in ['admin', 'clinician', 'billing_staff']:
+    if not request.user.is_superuser and request.user.role not in ['admin', 'clinician', 'billing_staff', 'nurse']:
          return Response({'error': 'Unauthorized'}, status=403)
          
     queryset = Patient.objects.all().order_by('-id')

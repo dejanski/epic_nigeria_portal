@@ -28,6 +28,12 @@ const Login = () => {
 
             localStorage.setItem('access_token', response.data.access_token);
             localStorage.setItem('refresh_token', response.data.refresh_token);
+
+            // Fetch User Details
+            const userRes = await api.get('/api/accounts/me/');
+            localStorage.setItem('is_superuser', userRes.data.is_superuser);
+            localStorage.setItem('user_role', userRes.data.role);
+
             navigate('/dashboard');
         } catch (err) {
             console.error(err);

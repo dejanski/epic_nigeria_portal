@@ -4,6 +4,9 @@ from django.db.models import Count, Sum
 from patients.models import Patient
 from clinical.models import ClinicalNote
 from billing.models import Claim
+from appointments.models import Appointment
+from labs.models import LabResult
+from datetime import date
 from django.db import connection
 from django.http import JsonResponse
 from drf_spectacular.utils import extend_schema
@@ -25,6 +28,12 @@ def analytics_summary(request):
     if metric_type in ['all', 'claims']:
         total_cost = Claim.objects.aggregate(total=Sum('cost'))['total'] or 0
         data['total_claims_value'] = float(total_cost)
+        
+    if metric_type in ['all', 'appointments']:
+        data['appointments_today'] = Appointment.objects.filter(appointment_datetime__date=date.today()).count()
+
+    if metric_type in ['all', 'labs']:
+        data['pending_labs'] = LabResult.objects.filter(status='pending').count()
 
     return Response(data)
 

@@ -8,7 +8,7 @@ from .models import Prescription, RefillRequest
 @extend_schema(request=PrescriptionSerializer, responses={201: dict})
 @api_view(['POST'])
 def prescribe_medication(request):
-    if request.user.role not in ['clinician', 'admin']:
+    if not request.user.is_superuser and request.user.role not in ['clinician', 'admin', 'nurse']:
         return Response({'error': 'Unauthorized'}, status=status.HTTP_403_FORBIDDEN)
     serializer = PrescriptionSerializer(data=request.data)
     if serializer.is_valid():
@@ -39,3 +39,14 @@ def request_refill(request, prescription_id):
         'refill_id': refill.id,
         'status': 'Refill request submitted'
     }, status=201)
+
+@extend_schema(responses={200: PrescriptionSerializer(many=True)})
+@api_view(['GET'])
+def list_prescriptions(request):
+    patient_id = request.query_params.get('patient_id')
+    if patient_id:
+        prescriptions = Prescription.objects.filter(patient_id=patient_id)
+    else:
+        prescriptions = Prescription.objects.all()
+    serializer = PrescriptionSerializer(prescriptions, many=True)
+    return Response(serializer.data)

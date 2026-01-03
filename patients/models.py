@@ -9,6 +9,8 @@ class Patient(models.Model):
     date_of_birth = models.DateField()
     gender = models.CharField(max_length=1, choices=GENDER_CHOICES)
     contact_info = models.CharField(max_length=255)
+    phone_number = models.CharField(max_length=20, blank=True, null=True)
+    guardian_name = models.CharField(max_length=255, blank=True, null=True)
     insurance_provider = models.CharField(max_length=100)
     nhia_id = models.CharField(max_length=50, blank=True, null=True)
 

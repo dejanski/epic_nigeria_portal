@@ -17,7 +17,7 @@ const Pharmacy = () => {
     const handleSubmit = async (e) => {
         e.preventDefault();
         try {
-            await api.post('/api/medications/prescriptions/', formData);
+            await api.post('/api/medications/prescribe/', formData);
             setMessage('Prescription sent successfully.');
             setFormData({ ...formData, medication_name: '', dosage: '', frequency: '', duration: '' });
         } catch (error) {

@@ -1,13 +1,37 @@
 import React, { useEffect, useState } from 'react';
 import Sidebar from '../components/Sidebar';
+import api from '../api';
+import { useNavigate } from 'react-router-dom';
 
 const Dashboard = () => {
     // In a real app, fetch stats from API
+    const navigate = useNavigate();
+    const [stats, setStats] = useState({
+        patients: 0,
+        appointments: 0,
+        labs: 0
+    });
+
+    useEffect(() => {
+        const fetchStats = async () => {
+            try {
+                const res = await api.get('/api/analytics/summary/');
+                setStats({
+                    patients: res.data.total_patients || 0,
+                    appointments: res.data.appointments_today || 0,
+                    labs: res.data.pending_labs || 0
+                });
+            } catch (error) {
+                console.error('Failed to fetch stats', error);
+            }
+        };
+        fetchStats();
+    }, []);
+
     const mockStats = [
-        { title: 'Total Patients', value: '1,234', color: '#0056b3' },
-        { title: 'Appointments Today', value: '42', color: '#28a745' },
-        { title: 'Pending Labs', value: '15', color: '#ffc107' },
-        { title: 'Revenue (Today)', value: '₦ 450,000', color: '#17a2b8' },
+        { title: 'Total Patients', value: stats.patients.toLocaleString(), color: '#0056b3' },
+        { title: 'Appointments Today', value: stats.appointments, color: '#28a745' },
+        { title: 'Pending Labs', value: stats.labs, color: '#ffc107' },
     ];
 
     return (

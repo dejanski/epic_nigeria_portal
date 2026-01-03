@@ -4,4 +4,4 @@ from .models import Patient
 class PatientRegistrationSerializer(serializers.ModelSerializer):
     class Meta:
         model = Patient
-        fields = ['id', 'name', 'date_of_birth', 'gender', 'contact_info', 'insurance_provider']
+        fields = ['id', 'name', 'date_of_birth', 'gender', 'contact_info', 'phone_number', 'guardian_name', 'insurance_provider']

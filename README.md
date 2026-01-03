@@ -67,6 +67,56 @@ python manage.py runserver
 ```
 The API will be available at `http://localhost:8000/`.
 
+## Docker Deployment
+
+To deploy the application using Docker, follow these steps:
+
+### 1. Prerequisites
+- Docker & Docker Compose installed on your machine.
+- Git installed.
+
+### 2. Deployment Steps
+
+1.  **Build and Run Containers**
+    Run the following command to build the images and start the services in detached mode:
+    ```bash
+    docker-compose up -d --build
+    ```
+
+2.  **Apply Database Migrations**
+    Once the containers are running, apply the database migrations to the PostgreSQL container:
+    ```bash
+    docker-compose exec backend python manage.py migrate
+    ```
+
+3.  **Create a Superuser**
+    Create an admin user to access the Django admin panel:
+    ```bash
+    docker-compose exec backend python manage.py createsuperuser
+    ```
+
+4.  **Collect Static Files** (Optional but recommended)
+    Ensure static files are properly served:
+    ```bash
+    docker-compose exec backend python manage.py collectstatic --noinput
+    ```
+
+### 3. Access the Application
+- **Frontend**: [http://localhost](http://localhost) (Served via Nginx)
+- **Backend API**: [http://localhost:8000](http://localhost:8000)
+- **Admin Panel**: [http://localhost:8000/admin/](http://localhost:8000/admin/)
+- **API Docs**: [http://localhost:8000/api/docs/](http://localhost:8000/api/docs/)
+
+### 4. Stopping the Containers
+To stop the services, run:
+```bash
+docker-compose down
+```
+To stop and remove volumes (WARNING: This deletes the database):
+```bash
+docker-compose down -v
+```
+
 ## API Documentation
 
 Interactive API documentation is currently available at:
