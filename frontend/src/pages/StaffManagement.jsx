@@ -5,6 +5,8 @@ import Sidebar from '../components/Sidebar';
 const StaffManagement = () => {
     const [staff, setStaff] = useState([]);
     const [isCreating, setIsCreating] = useState(false);
+    const [nextPage, setNextPage] = useState(null);
+    const [prevPage, setPrevPage] = useState(null);
     const [formData, setFormData] = useState({
         username: '',
         email: '',
@@ -14,10 +16,18 @@ const StaffManagement = () => {
         last_name: ''
     });
 
-    const fetchStaff = async () => {
+    const fetchStaff = async (url = '') => {
         try {
-            const res = await api.get('/api/accounts/staff/list/');
-            setStaff(res.data);
+            const endpoint = url || '/api/accounts/staff/list/';
+            const res = await api.get(endpoint);
+            // Handle paginated response
+            if (res.data.results) {
+                setStaff(res.data.results);
+                setNextPage(res.data.next);
+                setPrevPage(res.data.previous);
+            } else {
+                setStaff(res.data);
+            }
         } catch (err) {
             console.error('Failed to fetch staff:', err);
         }
@@ -26,6 +36,7 @@ const StaffManagement = () => {
     useEffect(() => {
         fetchStaff();
     }, []);
+
 
     const handleChange = (e) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -137,6 +148,25 @@ const StaffManagement = () => {
                             </tbody>
                         </table>
                     )}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px', paddingBottom: '20px' }}>
+                    <button
+                        className="btn-primary"
+                        disabled={!prevPage}
+                        onClick={() => fetchStaff(prevPage)}
+                        style={{ opacity: !prevPage ? 0.5 : 1 }}
+                    >
+                        &larr; Previous
+                    </button>
+                    <button
+                        className="btn-primary"
+                        disabled={!nextPage}
+                        onClick={() => fetchStaff(nextPage)}
+                        style={{ opacity: !nextPage ? 0.5 : 1 }}
+                    >
+                        Next &rarr;
+                    </button>
                 </div>
             </div>
         </div>

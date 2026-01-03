@@ -9,21 +9,43 @@ import './PatientList.css'; // Assuming you might move CSS to a file later, but 
 const PatientList = () => {
     const [patients, setPatients] = useState([]);
     const [loading, setLoading] = useState(true);
-    const [search, setSearch] = useState(''); // Changed from searchTerm to search
+    const [search, setSearch] = useState('');
+    const [nextPage, setNextPage] = useState(null);
+    const [prevPage, setPrevPage] = useState(null);
     const navigate = useNavigate();
 
     useEffect(() => {
         fetchPatients();
     }, []);
 
-    const fetchPatients = async (query = '') => {
+    const fetchPatients = async (urlOrQuery = '') => {
         setLoading(true);
         try {
-            const endpoint = query ? `/api/patients/list/?search=${query}` : '/api/patients/list/';
+            let endpoint = '/api/patients/list/';
+            if (urlOrQuery.startsWith('http')) {
+                // It's a full URL (next/prev) - strip domain to avoid CORS/proxy issues if needed, 
+                // or just use api.get with the full URL if axios handles it.
+                // Since api.js has baseURL, we need to be careful. 
+                // Easier to treat it as relative or pass full url if axios supports it (it does).
+                endpoint = urlOrQuery;
+            } else if (urlOrQuery) {
+                endpoint = `/api/patients/list/?search=${urlOrQuery}`;
+            }
+
+            // Note: If using full URL with axios instance having baseURL, it generally overrides it
+            // but let's be safe and use parameters if possible, or just the path.
+            // Django REST Framework returns full absolute URLs. 
+            // We can strip the origin or just pass it. 
+
             const response = await api.get(endpoint);
-            // Handle paginated response ({count, results}) or list response
-            const data = response.data.results ? response.data.results : response.data;
-            setPatients(data);
+            // Handle paginated response ({count, next, previous, results})
+            if (response.data.results) {
+                setPatients(response.data.results);
+                setNextPage(response.data.next);
+                setPrevPage(response.data.previous);
+            } else {
+                setPatients(response.data); // Fallback
+            }
         } catch (error) {
             console.error('Failed to fetch patients', error);
         } finally {
@@ -33,7 +55,7 @@ const PatientList = () => {
 
     const handleSearch = (e) => {
         e.preventDefault();
-        fetchPatients(search); // Use 'search' state
+        fetchPatients(search);
     };
 
     // Filter patients based on the search term for display
@@ -73,14 +95,33 @@ const PatientList = () => {
                             <div key={patient.id} className="patient-card" onClick={() => navigate(`/patients/${patient.id}`)}>
                                 <h3>{patient.name}</h3>
                                 <p><strong>ID:</strong> {patient.id}</p>
-                                <p><strong>DOB:</strong> {patient.date_of_birth}</p> {/* Changed from patient.dob to patient.date_of_birth */}
-                                <p><strong>Gender:</strong> {patient.gender}</p> {/* Added gender */}
-                                <p><strong>Insurance:</strong> {patient.insurance_provider}</p> {/* Added insurance */}
+                                <p><strong>DOB:</strong> {patient.date_of_birth}</p>
+                                <p><strong>Gender:</strong> {patient.gender}</p>
+                                <p><strong>Insurance:</strong> {patient.insurance_provider}</p>
                             </div>
                         ))
                     ) : (
                         <EmptyState message="No patients found matching your search." />
                     )}
+                </div>
+
+                <div style={{ display: 'flex', justifyContent: 'center', gap: '20px', marginTop: '20px', paddingBottom: '20px' }}>
+                    <button
+                        className="btn-primary"
+                        disabled={!prevPage}
+                        onClick={() => fetchPatients(prevPage)}
+                        style={{ opacity: !prevPage ? 0.5 : 1 }}
+                    >
+                        &larr; Previous
+                    </button>
+                    <button
+                        className="btn-primary"
+                        disabled={!nextPage}
+                        onClick={() => fetchPatients(nextPage)}
+                        style={{ opacity: !nextPage ? 0.5 : 1 }}
+                    >
+                        Next &rarr;
+                    </button>
                 </div>
             </div>
         </div>

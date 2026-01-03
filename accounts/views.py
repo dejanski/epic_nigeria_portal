@@ -14,9 +14,14 @@ User = get_user_model()
 @permission_classes([IsSuperUser])
 def list_staff(request):
     # List all users who are not patients
-    staff = User.objects.exclude(role='patient')
-    serializer = UserSerializer(staff, many=True)
-    return Response(serializer.data)
+    staff = User.objects.exclude(role='patient').order_by('-date_joined')
+    
+    from rest_framework.pagination import PageNumberPagination
+    paginator = PageNumberPagination()
+    result_page = paginator.paginate_queryset(staff, request)
+    serializer = UserSerializer(result_page, many=True)
+    return paginator.get_paginated_response(serializer.data)
+
 
 @extend_schema(request=UserCreateSerializer, responses={201: UserSerializer})
 @api_view(['POST'])
