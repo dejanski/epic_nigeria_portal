@@ -62,7 +62,7 @@ def delete_patient(request, patient_id):
 @api_view(['GET'])
 def list_patients(request):
     # RBAC: only staff/admin
-    if not request.user.is_superuser and request.user.role not in ['admin', 'clinician', 'billing_staff', 'nurse']:
+    if not request.user.is_superuser and request.user.role not in ['admin', 'clinician', 'billing_staff', 'nurse', 'lab_tech']:
          return Response({'error': 'Unauthorized'}, status=403)
          
     queryset = Patient.objects.all().order_by('-id')

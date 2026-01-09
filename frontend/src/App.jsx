@@ -14,6 +14,7 @@ import AuditLog from './pages/AuditLog';
 import StaffManagement from './pages/StaffManagement';
 import PatientPortal from './pages/PatientPortal';
 import Settings from './pages/Settings';
+import HospitalOnboarding from './pages/HospitalOnboarding';
 
 function App() {
   const isAuthenticated = !!localStorage.getItem('access_token');
@@ -67,8 +68,11 @@ function App() {
           element={isAuthenticated ? <Pharmacy /> : <Navigate to="/" />}
         />
         <Route
-          path="/staff"
           element={isAuthenticated ? <StaffManagement /> : <Navigate to="/" />}
+        />
+        <Route
+          path="/staff/onboard-hospital"
+          element={isAuthenticated ? <HospitalOnboarding /> : <Navigate to="/" />}
         />
         <Route
           path="/portal"

@@ -32,8 +32,11 @@ const Sidebar = () => {
                             <NavLink to="/pharmacy" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Pharmacy</NavLink>
                         )}
                         <NavLink to="/audit" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>System Audit</NavLink>
-                        {localStorage.getItem('is_superuser') === 'true' && (
-                            <NavLink to="/staff" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Staff Admin</NavLink>
+                        {(localStorage.getItem('is_superuser') === 'true' || localStorage.getItem('user_role') === 'admin') && (
+                            <>
+                                <NavLink to="/staff" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Staff Admin</NavLink>
+                                <NavLink to="/staff/onboard-hospital" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Add Hospital</NavLink>
+                            </>
                         )}
                         <NavLink to="/settings" className={({ isActive }) => `sidebar-link ${isActive ? 'active' : ''}`}>Settings</NavLink>
                     </>

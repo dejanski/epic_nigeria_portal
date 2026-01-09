@@ -15,7 +15,7 @@ from drf_spectacular.types import OpenApiTypes
 @extend_schema(responses={200: OpenApiTypes.OBJECT})
 @api_view(['GET'])
 def analytics_summary(request):
-    clinic_id = request.GET.get('clinic_id')
+    hospital_id = request.GET.get('hospital_id')
     date_range = request.GET.get('date_range')  # expect "YYYY-MM-DD,YYYY-MM-DD"
     metric_type = request.GET.get('metric_type', 'all')
 

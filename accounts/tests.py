@@ -22,7 +22,9 @@ class UserManagerTests(TestCase):
         self.assertTrue(admin_user.is_superuser)
         self.assertEqual(admin_user.role, 'admin')
 
-    def test_create_user_with_clinic_id(self):
-        """Test creating a user with a specific clinic ID"""
-        user = User.objects.create_user(username='doc1', password='password', role='clinician', clinic_id='LAG001')
-        self.assertEqual(user.clinic_id, 'LAG001')
+    def test_create_user_with_hospital(self):
+        """Test creating a user linked to a hospital"""
+        from hospitals.models import Hospital
+        hospital = Hospital.objects.create(name="Test Hospital", address="123 St", contact_info="000")
+        user = User.objects.create_user(username='doc1', password='password', role='clinician', hospital=hospital)
+        self.assertEqual(user.hospital, hospital)

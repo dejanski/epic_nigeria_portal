@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     'labs',
     'messaging',
     'audit',
+    'hospitals',
 ]
 
 MIDDLEWARE = [

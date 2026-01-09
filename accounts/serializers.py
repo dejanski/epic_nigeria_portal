@@ -6,7 +6,7 @@ User = get_user_model()
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'role', 'clinic_id', 'first_name', 'last_name']
+        fields = ['id', 'username', 'email', 'role', 'hospital', 'first_name', 'last_name']
 
 class ChangePasswordSerializer(serializers.Serializer):
     old_password = serializers.CharField(required=True)
@@ -17,7 +17,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = User
-        fields = ['username', 'password', 'email', 'role', 'clinic_id', 'first_name', 'last_name']
+        fields = ['username', 'password', 'email', 'role', 'hospital', 'first_name', 'last_name']
 
     def create(self, validated_data):
         user = User.objects.create_user(
@@ -25,7 +25,7 @@ class UserCreateSerializer(serializers.ModelSerializer):
             email=validated_data.get('email', ''),
             password=validated_data['password'],
             role=validated_data['role'],
-            clinic_id=validated_data.get('clinic_id', ''),
+            hospital=validated_data.get('hospital', None),
             first_name=validated_data.get('first_name', ''),
             last_name=validated_data.get('last_name', '')
         )

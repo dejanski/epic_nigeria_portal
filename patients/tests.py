@@ -16,6 +16,7 @@ class PatientTests(TestCase):
         self.patient_user = User.objects.create_user(username='patient1', password='password', role='patient')
         self.admin_user = User.objects.create_user(username='admin1', password='password', role='admin')
         self.other_user = User.objects.create_user(username='other1', password='password', role='patient')
+        self.lab_tech_user = User.objects.create_user(username='labtech1', password='password', role='lab_tech')
 
         # Create a patient profile linked to patient_user
         self.patient_profile = Patient.objects.create(
@@ -65,3 +66,10 @@ class PatientTests(TestCase):
         self.assertEqual(response.status_code, status.HTTP_200_OK)
         self.patient_profile.refresh_from_db()
         self.assertEqual(self.patient_profile.contact_info, "3333333333")
+
+    def test_lab_tech_list_patients(self):
+        """Test lab technician accessing patient list"""
+        self.client.force_authenticate(user=self.lab_tech_user)
+        url = reverse('list_patients')
+        response = self.client.get(url)
+        self.assertEqual(response.status_code, status.HTTP_200_OK)
